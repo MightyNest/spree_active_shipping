@@ -106,13 +106,14 @@ module Spree
             return rate_hash
           rescue ::ActiveShipping::Error => e
 
-            if e.class == ::ActiveShipping::ResponseError && e.response.is_a?(::ActiveShipping::Response)
+            if e.is_a?(::ActiveShipping::ResponseError) && e.response.is_a?(::ActiveShipping::Response)
               params = e.response.params
-              if params.has_key?("Response") && params["Response"].has_key?("Error") && params["Response"]["Error"].has_key?("ErrorDescription")
+            
+              if params.dig("Response", "Error", "ErrorDescription").present?
                 message = params["Response"]["Error"]["ErrorDescription"]
-              # Canada Post specific error message
-              elsif params.has_key?("eparcel") && params["eparcel"].has_key?("error") && params["eparcel"]["error"].has_key?("statusMessage")
-                message = e.response.params["eparcel"]["error"]["statusMessage"]
+              elsif params.dig("eparcel", "error", "statusMessage").present?
+                # Canada Post specific error message
+                message = params["eparcel"]["error"]["statusMessage"]
               else
                 message = e.message
               end
@@ -136,8 +137,9 @@ module Spree
             end
           rescue ::ActiveShipping::ResponseError => re
             if re.response.is_a?(::ActiveShipping::Response)
-              params = re.response.params
-              if params.has_key?("Response") && params["Response"].has_key?("Error") && params["Response"]["Error"].has_key?("ErrorDescription")
+              params = re.response.params.to_unsafe_h
+          
+              if params.dig("Response", "Error", "ErrorDescription").present?
                 message = params["Response"]["Error"]["ErrorDescription"]
               else
                 message = re.message
