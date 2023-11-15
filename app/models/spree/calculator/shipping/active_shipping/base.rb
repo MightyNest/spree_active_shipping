@@ -108,6 +108,8 @@ module Spree
 
             if e.is_a?(::ActiveShipping::ResponseError) && e.response.is_a?(::ActiveShipping::Response)
               params = e.response.params
+              
+              Rails.logger.debug "ActiveShipping error base: #{params.inspect}"
             
               if params.dig("Response", "Error", "ErrorDescription").present?
                 message = params["Response"]["Error"]["ErrorDescription"]

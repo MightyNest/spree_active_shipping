@@ -53,8 +53,10 @@ module Spree
           rescue ::ActiveShipping::Error => e
 
             if e.is_a?(::ActiveShipping::ResponseError) && e.response.is_a?(::ActiveShipping::Response)
-              params = e.response.params.to_unsafe_h
+              params = e.response.params
             
+              Rails.logger.debug "ActiveShipping error base usps: #{params.inspect}"
+
               if params.dig("Response", "Error", "ErrorDescription").present?
                 message = params["Response"]["Error"]["ErrorDescription"]
               elsif params.dig("eparcel", "error", "statusMessage").present?
