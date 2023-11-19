@@ -111,11 +111,11 @@ module Spree
               
               Rails.logger.debug "ActiveShipping error base: #{params.inspect}"
             
-              if params.dig("Response", "Error", "ErrorDescription").present?
-                message = params["Response"]["Error"]["ErrorDescription"]
-              elsif params.dig("eparcel", "error", "statusMessage").present?
+              if params['Response']['Error']['ErrorDescription'].present?
+                message = params['Response']['Error']['ErrorDescription']
+              elsif params['eparcel']["error"]["statusMessage"].present?
                 # Canada Post specific error message
-                message = params["eparcel"]["error"]["statusMessage"]
+                message = params['eparcel']["error"]["statusMessage"]
               else
                 message = e.message
               end
